@@ -1,0 +1,32 @@
+.container {
+  max-width: 90vw;
+  border: rgb(150, 150, 150) 0.4rem double;
+  padding: 0.5rem;
+  display: grid;
+  grid-gap: 0 1rem;
+  grid-template-columns: max-content minmax(10px, max-content);
+
+  span {
+    word-wrap: break-word;
+  }
+}
+
+.fieldTitleUser {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.fieldContentUser {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.fieldTitlePassword {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.fieldContentPassword {
+  grid-column: 2;
+  grid-row: 2;
+}
