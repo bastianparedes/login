@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from 'react';
 
-import { Loader } from 'bastianparedes/components';
+import { PrismaClient } from '@prisma/client';
 import DeleteAllUsersButton from 'components/DeleteAllUsersButton';
 
 import FormContainer from '../components/FormContainer';
 import SelectActionForm from '../components/SelectActionForm';
 import UserCard from '../components/UserCard';
 import WarningModal from '../components/WarningModal';
-import constants from '../config/constants';
 import { formKeys, getForm } from '../utils/getForm';
 
-const Index = (): JSX.Element => {
-  const [showLoader, setShowLoader] = useState(true);
-  const [users, setUsers] = useState<
-    Array<{ user: string; hashedPassword: string }>
-  >([]);
+interface props {
+  initialUsers: Array<{ user: string; hashedPassword: string }>;
+}
+
+const Index = ({ initialUsers }: props): JSX.Element => {
+  const [users, setUsers] =
+    useState<Array<{ user: string; hashedPassword: string }>>(initialUsers);
   const [showWarning, setShowWarning] = useState(false);
 
   const [formKey, setFormKey] = useState<string>(formKeys[0]);
@@ -25,29 +26,10 @@ const Index = (): JSX.Element => {
       sessionStorage.setItem('notFirstVisit', 'true');
       setShowWarning(true);
     }
-
-    const fetchData = async (): Promise<void> => {
-      const response = await fetch(
-        String(constants.backendDomain) + '/api/getUsers'
-      );
-
-      if (!response.ok) return;
-
-      const json = await response.json();
-      setUsers(
-        json.users.map((user: { user: string; password: string }) => ({
-          ...user,
-          hashedPassword: user.password
-        }))
-      );
-      setShowLoader(false);
-    };
-    void fetchData();
   }, []);
 
   return (
     <>
-      {showLoader && <Loader />}
       {showWarning && (
         <WarningModal setModalVisible={setShowWarning}>
           No ingreses contraseñas reales a esta aplicación
@@ -94,4 +76,21 @@ const Index = (): JSX.Element => {
   );
 };
 
+const getServerSideProps = async (): Promise<{ props: props }> => {
+  const prisma = new PrismaClient();
+  const initialUsers = await prisma.users.findMany();
+
+  return {
+    props: {
+      initialUsers: initialUsers.map(
+        (user: { user: string; password: string }) => ({
+          hashedPassword: user.password,
+          user: user.user
+        })
+      )
+    }
+  };
+};
+
+export { getServerSideProps };
 export default Index;
