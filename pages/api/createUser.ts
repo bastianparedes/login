@@ -1,10 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import constants from '../../config/constants';
-
-const prisma = new PrismaClient();
+import { prisma } from '../../lib/prisma';
 
 const createUser = async (
   req: NextApiRequest,
@@ -13,7 +11,7 @@ const createUser = async (
   if (req.method === 'POST') {
     const { user, password } = JSON.parse(req.body);
 
-    const foundUser = await prisma.users.findUnique({ where: { user } });
+    const foundUser = await prisma.fakeUser.findUnique({ where: { user } });
 
     if (foundUser !== null) {
       res.send({ error: constants.errors.userAlreadyExists, success: false });
@@ -21,7 +19,7 @@ const createUser = async (
     }
 
     const hashedPassword = await bcrypt.hash(password, constants.hashRounds);
-    await prisma.users.create({
+    await prisma.fakeUser.create({
       data: {
         password: hashedPassword,
         user

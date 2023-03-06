@@ -1,10 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import constants from '../../config/constants';
-
-const prisma = new PrismaClient();
+import { prisma } from '../../lib/prisma';
 
 const updatePassword = async (
   req: NextApiRequest,
@@ -12,7 +10,7 @@ const updatePassword = async (
 ): Promise<void> => {
   if (req.method === 'PUT') {
     const { user, oldPassword, newPassword } = JSON.parse(req.body);
-    const foundUser = await prisma.users.findUnique({ where: { user } });
+    const foundUser = await prisma.fakeUser.findUnique({ where: { user } });
 
     if (foundUser === null) {
       res.send({ error: constants.errors.userDoesNotExist, success: false });
@@ -34,7 +32,7 @@ const updatePassword = async (
       constants.hashRounds
     );
 
-    await prisma.users.update({
+    await prisma.fakeUser.update({
       data: { password: newHashedPassword },
       where: { user }
     });

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 
-import { PrismaClient } from '@prisma/client';
 import DeleteAllUsersButton from 'components/DeleteAllUsersButton';
 
 import FormContainer from '../components/FormContainer';
 import SelectActionForm from '../components/SelectActionForm';
 import UserCard from '../components/UserCard';
 import WarningModal from '../components/WarningModal';
+import { prisma } from '../lib/prisma';
 import { formKeys, getForm } from '../utils/getForm';
 
 interface props {
@@ -77,8 +77,7 @@ const Index = ({ initialUsers }: props): JSX.Element => {
 };
 
 const getServerSideProps = async (): Promise<{ props: props }> => {
-  const prisma = new PrismaClient();
-  const initialUsers = await prisma.users.findMany();
+  const initialUsers = await prisma.fakeUser.findMany();
 
   return {
     props: {

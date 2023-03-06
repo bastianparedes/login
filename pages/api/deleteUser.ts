@@ -1,10 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import constants from '../../config/constants';
-
-const prisma = new PrismaClient();
+import { prisma } from '../../lib/prisma';
 
 const deleteUser = async (
   req: NextApiRequest,
@@ -13,7 +11,7 @@ const deleteUser = async (
   if (req.method === 'DELETE') {
     const { user, password } = JSON.parse(req.body);
 
-    const foundUser = await prisma.users.findUnique({ where: { user } });
+    const foundUser = await prisma.fakeUser.findUnique({ where: { user } });
 
     if (foundUser === null) {
       res.send({ error: constants.errors.userDoesNotExist, success: false });
@@ -30,7 +28,7 @@ const deleteUser = async (
       return;
     }
 
-    await prisma.users.delete({ where: { user } });
+    await prisma.fakeUser.delete({ where: { user } });
     res.send({ success: true });
   }
 };
